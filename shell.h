@@ -7,22 +7,34 @@
 #include <unistd.h>
 
 
+typedef struct commands {
+	char *input;
+	unsigned int input_size;
+	char **tokens;
+	unsigned int token_count;
+} command_t;
+
 /** String functions **/
 void _append(char *dest, char *src);
+unsigned int _count_tokens(char *array, char target);
 int _seek(char *src, char c);
 void _strcpy(char *dest, char *src);
+void tokenize(command_t *usr_input);
+char *_strtok(char *src, char target);
 
 /** Memory functions **/
-void *_new_mem(ssize_t n, const unsigned int size);
-void *_init_mem(ssize_t n, const unsigned int size);
-void _resize(char **buf, ssize_t *size);
+void *_new_mem(const unsigned int size);
+void *_init_memory(const unsigned int size);
+unsigned int _resize(char **buf, const unsigned int size);
+void _cleanup(command_t *buf, const char *msg, const int exit_code);
 
 /** IO functions **/
-ssize_t _getline(char **lineptr, int fd);
-void get_input(char *tokens);
+ssize_t _getline(command_t *lineptr, int fd);
 
 /** main functions **/
-void get_cmds(char **cmds);
+void initialize(command_t **usr_input);
+void get_command(command_t *usr_input);
+int check_command(command_t *usr_input);
 
 
 #endif

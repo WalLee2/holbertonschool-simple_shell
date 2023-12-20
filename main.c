@@ -2,58 +2,72 @@
 
 int main(void)
 {
-	char **cmds = NULL;
 
-	/**
-	if (!(_init(*cmds)))
-		return (-1);
-	*/
+	command_t *usr_input = NULL;
 
-	write(STDOUT_FILENO, "$ ", 2);
+	initialize(&usr_input);
 	while (1)
 	{
-		get_cmds(cmds);
+		get_command(usr_input);
+		check_command(usr_input);
 		/**
-		check_cmd();
 		execute();
 		**/
 	}
 	return (0);
 }
-/**
-void _init(char *cmds)
-{
-	 # Need to know how long each string for the command is
-}
-*/
+
 
 /**
- * get_cmd - Function that gets user input, tokenizes inputs, and
- * appends inputs to the end of strings stored in PATH
- * Return: pointer to array of strings where strings are potential commands
+ * initialize - Write prompt to standard output and allocate memory
+ * to collect user input
+ *
+ * @usr_input: struct that holds user input and tokenized inputs
  */
-void get_cmds(char **cmds)
+void initialize(command_t **usr_input)
 {
-	char *tokens = NULL;
+	write(STDOUT_FILENO, "$ ", 2);
 
-	get_input(tokens);
+	*usr_input = _init_memory(sizeof(command_t));
+	if (!(*usr_input))
+	{
+		char *msg = "Unable to allocate memory!\n";
+		_cleanup(*usr_input, msg, 1);
+	}
+}
+
+
+/**
+ * get_command - Get user input and tokenizes those inputs delimited by a space
+ * @usr_input: struct that holds user input and tokenized inputs
+ */
+void get_command(command_t *usr_input)
+{
+	if (!usr_input)
+	{
+		char *msg = "Failed to initialize struct usr_input!\n";
+		_cleanup(usr_input, msg, 2);
+	}
+	usr_input->input_size = _getline(usr_input, STDOUT_FILENO);
+	tokenize(usr_input);
+}
+
+/**
+ * check_command - Take tokenized inputs and append them to directory paths
+ * found in PATH environment variable
+ * Use the stat system call to see if input exists in new directory path
+ *
+ * @usr_input: struct that holds user input and tokenized inputs
+ */
+int check_command(command_t *usr_input)
+{
+	char *msg = "Debugging!\n";
+	_cleanup(usr_input, msg, 100);
 	/**
 	paths =	get_path();
 	append_tokens(cmds, paths, tokens);
+	stat()
 	*/
-
+	return (1);
 }
 
-void get_input(char *tokens)
-{
-	int n = 0;
-	char *tmp;
-
-	n = _getline(&tmp, STDOUT_FILENO);
-	printf("Bytes read: %d\nString: %s\n", n, tmp);
-	_strtok(tmp, ' ');
-	/**
-	 * Struct needed? String ptr and number of characters?
-	 * OR double ptr with array of ptrs to char array?
-	 */
-}
