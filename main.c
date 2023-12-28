@@ -31,8 +31,7 @@ void initialize(command_t **usr_input)
 	*usr_input = _init_memory(sizeof(command_t));
 	if (!(*usr_input))
 	{
-		char *msg = "Unable to allocate memory!\n";
-		_cleanup(*usr_input, msg, 1);
+		_cleanup_and_exit(1, 1, usr_input);
 	}
 }
 
@@ -43,13 +42,14 @@ void initialize(command_t **usr_input)
  */
 void get_command(command_t *usr_input)
 {
+	char target = ' ';
+
 	if (!usr_input)
 	{
-		char *msg = "Failed to initialize struct usr_input!\n";
-		_cleanup(usr_input, msg, 2);
+		_cleanup_and_exit(2, 1, usr_input);
 	}
 	usr_input->input_size = _getline(usr_input, STDOUT_FILENO);
-	tokenize(usr_input);
+	tokenize(usr_input, target);
 }
 
 /**
@@ -61,11 +61,15 @@ void get_command(command_t *usr_input)
  */
 int check_command(command_t *usr_input)
 {
-	char *msg = "Debugging!\n";
-	_cleanup(usr_input, msg, 100);
+	command_t *paths = NULL;
+	paths = _init_memory(sizeof(command_t));
+
+	_get_path(paths);
+	// _append_tokens(usr_input->tokens, paths->tokens);
+	printf("Freeing paths!\n");
+	_cleanup_and_exit(100, 2, usr_input, paths);
+
 	/**
-	paths =	get_path();
-	append_tokens(cmds, paths, tokens);
 	stat()
 	*/
 	return (1);

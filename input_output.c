@@ -1,6 +1,28 @@
 #include "shell.h"
 
 
+void _get_path(command_t *paths)
+{
+	char *target = "PATH=", *tmp = NULL;
+
+	_search_environ(&tmp, target);
+	tmp = _filter(tmp, target);
+	paths->input_size = _strlen(tmp);
+	// paths->input_size + 1 to account for null termianted string
+	paths->input = _init_memory(paths->input_size + 1 * sizeof(char));
+	_strcpy(paths->input, tmp);
+	// printf("input_size: %i\n", paths->input_size);
+
+	tokenize(paths, ':');
+
+	// printf("token count: %i\n", paths->token_count);
+	// printf("token: %s\n", paths->tokens[0]);
+	for (unsigned int i = 0; i < paths->token_count; i++)
+	{
+		printf("token: %s\n", paths->tokens[i]);
+	}
+}
+
 /**
  * _getline - Get all characters entered by a user
  *
@@ -20,8 +42,7 @@ ssize_t _getline(command_t *usr_input, int fd)
 	buf = _init_memory(buf_size * sizeof(char));
 	if (!buf)
 	{
-		char *msg = "Unable to allocate memory!\n";
-		_cleanup(usr_input, msg, 1);
+		_cleanup_and_exit(1, 1, usr_input);
 	}
 
 	while ((read_bytes = read(fd, helper, HELP_SIZE)) > 0)
@@ -32,8 +53,7 @@ ssize_t _getline(command_t *usr_input, int fd)
 			buf_size = _resize(&buf, buf_size);
 			if (!buf)
 			{
-				char *msg = "Unable to allocate memory!\n";
-				_cleanup(usr_input, msg, 1);
+				_cleanup_and_exit(1, 1, usr_input);
 			}
 		}
 		if (buf[0] == '\0')

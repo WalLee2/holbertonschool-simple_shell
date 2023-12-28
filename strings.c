@@ -16,14 +16,19 @@ void _append(char *dest, char *src)
 
 	for (int j = 0; src[j] != '\0'; j++)
 	{
-		if (src[j] == '\n')
-			continue;
+		// if (src[j] == '\n')
+		// 	continue;
 		dest[j + i] = src[j];
 	}
 
 	dest[i + 1] = '\0';
 }
 
+
+// void _append_tokens(char **dest, char **src)
+// {
+
+// }
 
 /**
  * _count_tokens - Count the number of tokens and if there are characters in array
@@ -34,6 +39,7 @@ void _append(char *dest, char *src)
 unsigned int _count_tokens(char *array, char target)
 {
 	unsigned int count = 0, i = 0;
+	char flag = '-';
 
 	for (; array[i] != '\0'; i++)
 	{
@@ -47,6 +53,21 @@ unsigned int _count_tokens(char *array, char target)
 		count += 1;
 	}
 	return (count);
+}
+
+
+unsigned int _get_token_size(char *src, char target)
+{
+	int i;
+
+	for (i = 0; src[i] != '\0'; i++)
+	{
+		if (src[i] == target)
+		{
+			break;
+		}
+	}
+	return (i);
 }
 
 /**
@@ -68,6 +89,23 @@ int _seek(char *src, char c)
 
 
 /**
+ * _strlen - Find the length of a string
+ * @src: Character array to find the length of
+ * Return - The length of the string
+ */
+int _strlen(char *src)
+{
+	int i = 0;
+
+	while (src[i] != '\0')
+	{
+		i++;
+	}
+
+	return i;
+}
+
+/**
  * _strcpy - Copy one character array to another
  *
  * @dest: Destination array to copy to
@@ -79,12 +117,12 @@ void _strcpy(char *dest, char *src)
 
 	for (i = 0; src[i] != '\0'; i++)
 	{
-		if (src[i] == '\n')
-			continue;
+		// if (src[i] == '\n')
+		// 	continue;
 		dest[i] = src[i];
 	}
 
-	dest[i + 1] = '\0';
+	dest[i] = '\0';
 }
 
 /**
@@ -98,25 +136,55 @@ void _strncpy(char *dest, char *src, int n)
 {
 	int i = 0;
 
-	while (src[i] != '\0' && i < n)
+	while (i < n && src[i] != '\0')
 	{
 		dest[i] = src[i];
 		i++;
 	}
+}
 
-	if (i == n - 1)
+void _strncpy_token(char *dest, char *src, int n)
+{
+	int i = 0;
+
+	while (i < n && src[i] != '\0')
 	{
-		dest[i + 1] = '\0';
+		dest[i] = src[i];
+		i++;
 	}
+	dest[i] = '\0';
 }
 
 
 /**
+ * _strcmp - Compare and find string needle in haystack.
+ *
+ * @haystack: String to search
+ * @needle: String to find
+ *
+ * Return - 1 if found, 0 otherwise 
+ */
+int _strcmp(char *haystack, char *needle)
+{
+	int found = 1;
+
+	for (int i = 0; needle[i] != '\0'; i++)
+	{
+		if (haystack[i] != needle[i])
+		{
+			found = 0;
+		}
+	}
+
+	return found;
+}
+
+/**
  * tokenize - Create tokens, which are character arrays, from inputs given by the user
  *
- * @usr_input - struct that holds user input and tokenized inputs
+ * @usr_input - struct that holds a string to search and tokenized strings
  */
-void tokenize(command_t *usr_input)
+void tokenize(command_t *input, char target)
 {
 	/**
 		count number of tokens (characters separated by spaces)
@@ -124,27 +192,42 @@ void tokenize(command_t *usr_input)
 		allocate enough space for an array of characters which represents a token
 	*/
 	char *tmp = NULL;
-	char target = ' ';
+	int token_size = 0;
 
-	usr_input->token_count = _count_tokens(usr_input->input, target);
-	usr_input->tokens = _init_memory(usr_input->token_count * sizeof(char *));
+	input->token_count = _count_tokens(input->input, target);
+	input->tokens = _init_memory(input->token_count * sizeof(char *));
+	printf("token_count: %i\n", input->token_count);
 
-	if (usr_input->tokens == NULL)
+
+	if (input->tokens == NULL)
 	{
-		char *msg = "Unable to allocate memory!\n";
-		_cleanup(usr_input, msg, 1);
+		_cleanup_and_exit(1, 1, input);
 	}
 
-	tmp = usr_input->input;
-	for (unsigned int i = 0; i < usr_input->token_count; i++)
+
+	tmp = input->input;
+	for (unsigned int i = 0; i < input->token_count; i++)
 	{
-		usr_input->tokens[i] = _strtok(tmp, target);
-		if (usr_input->tokens[i] == NULL)
+		token_size = _get_token_size(tmp, target);
+		input->tokens[i] = _strtok(tmp, token_size);
+		if (input->tokens[i] == NULL)
 		{
-			char *msg = "Unable to allocate memory!\n";
-			_cleanup(usr_input, msg, 1);
+			_cleanup_and_exit(1, 1, input);
+		}
+		
+		tmp += token_size;
+
+		// increment the pointer past target to get next token
+		if (tmp[0] == target)
+		{
+			tmp++;
 		}
 	}
+
+	// for (unsigned int i = 0; i < input->token_count; i++)
+	// {
+	// 	printf("%s\n", input->tokens[i]);
+	// }
 }
 
 
@@ -157,27 +240,49 @@ void tokenize(command_t *usr_input)
  *	
  * Return - New character array
  */
-char *_strtok(char *src, char target)
+// char *_strtok(char *src, char target)
+char *_strtok(char *src, unsigned int token_size)
 {
 	char *new_token = NULL;
-	int token_size = 0;
 
-	for (int i = 0; src[i] != '\0'; i++, token_size++)
-	{
-		if (src[i] == target)
-		{
-			break;
-		}
-	}
-
-	new_token = _init_memory(token_size * sizeof(char));
+	// token_size + 1 to account for null terminated string
+	new_token = _init_memory(token_size + 1 * sizeof(char));
 	if (new_token == NULL)
 	{
 		return (NULL);
 	}
-	_strncpy(new_token, src, token_size);
-	src += token_size;
+	printf("string: %s\n", src);
+	printf("token_size: %i\n", token_size);
+	_strncpy_token(new_token, src, token_size);
+
 
 	return (new_token);
 }
 
+
+void _search_environ(char **dest, char *target)
+{
+	for (int i = 0; environ[i]; i++)
+	{
+		if (_strcmp(environ[i], target))
+		{
+			*dest = environ[i];
+			break;
+		}
+	}
+}
+
+
+char *_filter(char *dest, char *target)
+{
+	int i = 0;
+	while (target[i] != '\0')
+	{
+		if (target[i] == dest[i])
+		{
+			i++;
+		}
+	}
+
+	return (dest + i);
+}

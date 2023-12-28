@@ -4,33 +4,72 @@
 /**
  * _cleanup - Function used to free up memory if unexpected behavior occurs and we need to exit
  *
- * @buf:  Struct variable containing malloc'd memory
- * @msg:  Error message to print to standard output
+ * @msg: Error message to print to standard output
  * @exit_code: integer value to exit the program with 
+ * @n: Number of structs that need to free-ing before exiting program
  */
-void _cleanup(command_t *buf, const char *msg, const int exit_code)
+// void _cleanup(const char *msg, const int exit_code, command_t *buf)
+void _cleanup_and_exit(const int exit_code, const int n, ...)
 {
-	if (buf)
-	{
-		if (buf->input)
-		{
-			free(buf->input);		
-		}
-		if (buf->tokens)
-		{
-			for (unsigned int i = 0; i < buf->token_count; i++)
-			{
-				free(buf->tokens[i]);
-			}
-			free(buf->tokens);
-		}
+	va_list ap;
+	command_t *buf = NULL;
 
-			free(buf);		
+	exit_codes_t codes[] = {
+		{1, "Unable to allocate memory!\n"},
+		{2, "Failed to initialize struct usr_input!\n"},
+		{100, "Testing!\n"},
+		{-1, NULL}
+	};
+
+	va_start(ap, n);
+	for (int i = 0; i < n; i++)
+	{
+		buf = va_arg(ap, command_t *);
+		_clean_up_mem(1, buf);
 	}
-	printf("%s", msg);
-	exit(exit_code);
+	va_end(ap);
+
+	for (int i = 0; codes[i].msg != NULL; i++)
+	{
+		if (codes[i].code == exit_code)
+		{
+			printf("%s", codes[i].msg);
+			exit(codes[i].code);
+		}
+	}
 }
 
+void _clean_up_mem(const int n, ...)
+{
+	va_list ap;
+	command_t *buf = NULL;
+
+	va_start(ap, n);
+	for (int i = 0; i < n; i++) 
+	{
+		buf = va_arg(ap, command_t *);
+		if (buf)
+		{
+			if (buf->input != NULL)
+			{
+				free(buf->input);
+			}
+			if (buf->tokens)
+			{
+				for (unsigned int i = 0; i < buf->token_count; i++)
+				{
+					free(buf->tokens[i]);
+					buf->tokens[i] = NULL;
+				}
+				free(buf->tokens);
+				buf->tokens = NULL;
+			}
+			free(buf);
+			buf = NULL;
+		}
+	}
+	va_end(ap);
+}
 
 /**
  * _init_memory - Create dynamically allocated space and properly wipe any previous memory
