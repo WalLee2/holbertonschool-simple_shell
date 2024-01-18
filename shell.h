@@ -6,14 +6,29 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 
 extern char **environ;
 
+
+typedef struct token {
+	char *string;
+	unsigned int size;
+} token_t;
+
+
+typedef struct special_chars {
+	char *str;
+	char c;
+
+}specialChars_t;
+
 /**
  * struct commands - struct that holds input strings to be made into tokens for further action
- * @input: string to tokenize
+ * @input: string to turn into tokens
  * @input_size: character count of input string
- * @tokens: input string turned into an array of strings
+ * @tokens: input string turned into an array of structs that holds the string and the size
  * @token_count: total number of tokens
  */
 typedef struct commands {
@@ -34,44 +49,45 @@ typedef struct exit_codes {
 } exit_codes_t;
 
 
-// typedef struct token {
-// 	char *str;
-// 	unsigned int size;
-// }
-
 /** String functions **/
 void _append(char *dest, char *src);
-unsigned int _count_tokens(char *array, char target);
-unsigned int _get_token_size(char *src, char target);
+// void _append_tokens(command_t *input, command_t *paths);
+int _check_command(command_t *usr_input, command_t *paths);
+unsigned int _count_tokens(char *array, char *target);
+char *_filter(char *dest, char *target);
+unsigned int _get_token_size(char *src, char *target);
+void _prune_paths(command_t *paths);
+void _resize_append(command_t *input, char *target);
 int _seek(char *src, char c);
 void _strcpy(char *dest, char *src);
 void _strncpy(char *dest, char *src, int n);
 void _strncpy_token(char *dest, char *src, int n);
 int _strlen(char *src);
-void tokenize(command_t *usr_input, char target);
-// char *_strtok(char *src, char target);
-char *_strtok(char *src, unsigned int token_size);
+// char *_strtok(char *src, unsigned int token_size);
+char *_strtok(char *src, char *target);
 int _strcmp(char *haystack, char *needle);
 void _search_environ(char **dest, char *target);
-char *_filter(char *dest, char *target);
+void tokenize(command_t *usr_input, char *target);
 
 
+/** Process functions **/
+void _run_process(char *command, char **args);
 
 /** Memory functions **/
 void *_new_mem(const unsigned int size);
 void *_init_memory(const unsigned int size);
 unsigned int _resize(char **buf, const unsigned int size);
 void _cleanup_and_exit(const int exit_code, const int n, ...);
-void _clean_up_mem(const int n, ...);
+void _cleanup_mem(const int n, ...);
 
 /** IO functions **/
 ssize_t _getline(command_t *lineptr, int fd);
-void _get_path(command_t *paths);
 
 /** main functions **/
-void initialize(command_t **usr_input);
+void initialize(command_t **usr_input, command_t **paths);
 void get_command(command_t *usr_input);
-int check_command(command_t *usr_input);
+void get_path(command_t *paths);
+void execute(command_t *usr_input, command_t *paths);
 
 
 #endif

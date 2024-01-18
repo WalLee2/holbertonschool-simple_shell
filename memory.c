@@ -25,7 +25,7 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 	for (int i = 0; i < n; i++)
 	{
 		buf = va_arg(ap, command_t *);
-		_clean_up_mem(1, buf);
+		_cleanup_mem(1, buf);
 	}
 	va_end(ap);
 
@@ -39,7 +39,7 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 	}
 }
 
-void _clean_up_mem(const int n, ...)
+void _cleanup_mem(const int n, ...)
 {
 	va_list ap;
 	command_t *buf = NULL;
@@ -53,13 +53,17 @@ void _clean_up_mem(const int n, ...)
 			if (buf->input != NULL)
 			{
 				free(buf->input);
+				buf->input = NULL;
 			}
 			if (buf->tokens)
 			{
 				for (unsigned int i = 0; i < buf->token_count; i++)
 				{
-					free(buf->tokens[i]);
-					buf->tokens[i] = NULL;
+					if (buf->tokens[i] != NULL)
+					{
+						free(buf->tokens[i]);
+						buf->tokens[i] = NULL;						
+					}
 				}
 				free(buf->tokens);
 				buf->tokens = NULL;
@@ -110,13 +114,21 @@ unsigned int _resize(char **buf, const unsigned int size)
 	char *tmp = *buf;
 	int new_size = size * 2 * sizeof(char);
 
+	// printf("tmp: %p\n", tmp);
 	*buf = _init_memory(new_size);
+	// printf("buf: %p\n", *buf);
 
 	if (!buf)
+	{
 		return (0);
+	}
 
 	_strcpy(*buf, tmp);
-	free(tmp);
+	// if (tmp)
+	// {
+	// 	free(tmp);
+	// }
 
+	// printf("new size: %d\n", new_size);
 	return (new_size);
 }

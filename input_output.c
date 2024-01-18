@@ -1,26 +1,25 @@
 #include "shell.h"
 
 
-void _get_path(command_t *paths)
+void get_path(command_t *paths)
 {
-	char *target = "PATH=", *tmp = NULL;
+	char *tmp = NULL;
+	char *target[] = {"PATH=", ":", "/"};
 
-	_search_environ(&tmp, target);
-	tmp = _filter(tmp, target);
+	_search_environ(&tmp, target[0]);
+	tmp = _filter(tmp, target[0]);
 	paths->input_size = _strlen(tmp);
 	// paths->input_size + 1 to account for null termianted string
 	paths->input = _init_memory(paths->input_size + 1 * sizeof(char));
 	_strcpy(paths->input, tmp);
-	// printf("input_size: %i\n", paths->input_size);
-
-	tokenize(paths, ':');
-
+	tokenize(paths, target[1]);
+	_resize_append(paths, target[2]);
 	// printf("token count: %i\n", paths->token_count);
 	// printf("token: %s\n", paths->tokens[0]);
-	for (unsigned int i = 0; i < paths->token_count; i++)
-	{
-		printf("token: %s\n", paths->tokens[i]);
-	}
+	// for (unsigned int i = 0; i < paths->token_count; i++)
+	// {
+	// 	printf("token: %s\n", paths->tokens[i]->string);
+	// }
 }
 
 /**
@@ -68,6 +67,5 @@ ssize_t _getline(command_t *usr_input, int fd)
 			break;
 	}
 	usr_input->input = buf;
-
 	return (total);
 }
