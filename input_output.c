@@ -1,27 +1,6 @@
 #include "shell.h"
 
 
-void get_path(command_t *paths)
-{
-	char *tmp = NULL;
-	char *target[] = {"PATH=", ":", "/"};
-
-	_search_environ(&tmp, target[0]);
-	tmp = _filter(tmp, target[0]);
-	paths->input_size = _strlen(tmp);
-	// paths->input_size + 1 to account for null termianted string
-	paths->input = _init_memory(paths->input_size + 1 * sizeof(char));
-	_strcpy(paths->input, tmp);
-	tokenize(paths, target[1]);
-	_resize_append(paths, target[2]);
-	// printf("token count: %i\n", paths->token_count);
-	// printf("token: %s\n", paths->tokens[0]);
-	// for (unsigned int i = 0; i < paths->token_count; i++)
-	// {
-	// 	printf("token: %s\n", paths->tokens[i]->string);
-	// }
-}
-
 /**
  * _getline - Get all characters entered by a user
  *

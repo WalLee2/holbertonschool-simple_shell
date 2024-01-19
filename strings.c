@@ -16,48 +16,33 @@ void _append(char *dest, char *src)
 
 	for (j = 0; src[j] != '\0'; j++)
 	{
-		if (src[j] == '\n')
-			continue;
 		dest[j + i] = src[j];
 	}
 
 	dest[i + j] = '\0';
 }
 
+/**
+ * _resize_append - function that resizes buffer and appends to the end of a buffer
+ * @input: struct containing the pointer to buffer to resize
+ * @target: character that indicates when to start appending
+ */
 
-// void _append_tokens(command_t *usr_input, command_t *paths)
-// {
-// 	unsigned int new_size = 0;
-
-// 	// for (unsigned int i = 0; i < paths->token_count; i++)
-// 	// {
-// 	// 	new_size = usr_input->tokens[j]->size + paths->tokens[i]->size + 1;
-// 	// 	paths->tokens[i]->size = new_size;
-// 	// 	_resize(&paths->tokens[i]->string, new_size);
-// 	// 	_append(paths->tokens[i]->string, usr_input->tokens[0]->string);
-// 	// }
-
-// 	for (unsigned int i = 0; usr_input->tokens[i]->string != NULL; i++)
-// 	{
-// 		new_size = usr_input->tokens[j]->size + paths->tokens[i]->size + 1;
-
-// 	}
-// }
-
-
-void _resize_append(command_t *input, char *target)
+int _resize_append(command_t *input, char *target)
 {
 	int new_size = 0;
 
-	printf("In _resize_append\n");
 	for (unsigned int i = 0; input->tokens[i] != NULL; i++)
 	{
-		// new_size = input->tokens[i]->size + 1;
 		new_size = _strlen(input->tokens[i]) + _strlen(target) + 1;
-		_resize(&input->tokens[i], new_size);
+		new_size = _resize(&input->tokens[i], new_size);
+		if (!new_size)
+		{
+			return (5);
+		}
 		_append(input->tokens[i], target);
 	}
-	printf("Finished _resize_append");
+	return (0);
 }
 
 
@@ -81,22 +66,12 @@ unsigned int _count_tokens(char *array, char *target)
 	return (count);
 }
 
-
-
-// int _check_command(command_t *usr_input, command_t *paths)
-// {
-// 	int status = 0, i = 0;
-
-
-// 	for (; paths->tokens[i] != NULL; i++)
-// 	{
-
-
-// 	}
-// 	// printf("%s\n", usr_input->tokens[0]);
-// 	return (status);
-// }
-
+/**
+ * _get_token_size - get size of the token up until a target character
+ * @src: Source array to search
+ * @target: Character array that contains target characters to stop count and return
+ * Return - The length of a token
+ */
 unsigned int _get_token_size(char *src, char *target)
 {
 	int i = 0;
@@ -115,41 +90,12 @@ unsigned int _get_token_size(char *src, char *target)
 }
 
 
-// void _prune_paths(command_t *paths)
-// {
-// 	struct stat st;
-
-// 	unsigned int i, valid_paths = 0;
-
-// 	for (i = 0; i < paths->token_count; i++)
-// 	{
-// 		printf("%s ", paths->tokens[i]->string);
-// 		if (stat(paths->tokens[i]->string, &st) == -1)
-// 		{
-// 			// free(paths->tokens[i]->string);
-// 			printf("Not Found!\n");
-// 		}
-// 		else
-// 		{
-// 			printf("Found!\n");
-// 			valid_paths++;
-// 		}
-// 	}
-// 	printf("Valid paths count: %i\n", valid_paths);
-// 	// paths->token_count = valid_paths;
-
-// 	// for (unsigned int i = 0; i < paths->token_count; i++)
-// 	// {
-// 	// 	printf("token: %s\n", paths->tokens[i]->string);
-// 	// }
-// }
-
 /**
  * _seek - Find a character in an array
  *
  * @src: Array to search through
  * @c: Target character to find
- * Return - 1 if found and 0 otherwise
+ * Return - 0 if not found 1 if found
  */
 int _seek(char *src, char c)
 {
@@ -186,17 +132,24 @@ int _strlen(char *src)
  *
  * @dest: Destination array to copy to
  * @src: Source array to copy from
+ * Return - 0 on failure and 1 on success
  */
-void _strcpy(char *dest, char *src)
+int _strcpy(char *dest, char *src)
 {
 	int i = 0;
 
+	if (!src)
+	{
+		return (0);
+	}
 	for (i = 0; src[i] != '\0'; i++)
 	{
 		dest[i] = src[i];
 	}
 
 	dest[i] = '\0';
+
+	return (1);
 }
 
 /**
@@ -204,29 +157,48 @@ void _strcpy(char *dest, char *src)
  *
  * @dest: Destination array to copy to
  * @src: Source array to copy from
- * @n: Number of characters to copy
+ * @n: Number of characters to copy that can fit in dest array
+ * Return - 0 on failure and 1 on success
  */
-void _strncpy(char *dest, char *src, int n)
+int _strncpy(char *dest, char *src, int n)
 {
 	int i = 0;
 
+	if (!src)
+	{
+		return (0);
+	}
 	while (i < n && src[i] != '\0')
 	{
 		dest[i] = src[i];
 		i++;
 	}
+	return (1);
 }
 
-void _strncpy_token(char *dest, char *src, int n)
+/**
+ * _strncpy_token - Copy n number of characters from source to destination array and append '\0'
+ * @dest: Destination array to copy to
+ * @src: Source array to copy from
+ * @n: Number of characters that can fit in destination array
+ * Return - 0 on failure and 1 on success
+ */
+int _strncpy_token(char *dest, char *src, int n)
 {
 	int i = 0;
 
+	if (!src)
+	{
+		return (0);
+	}
 	while (i < n && src[i] != '\0')
 	{
 		dest[i] = src[i];
 		i++;
 	}
 	dest[i] = '\0';
+
+	return (1);
 }
 
 
@@ -256,43 +228,41 @@ int _strcmp(char *haystack, char *needle)
 /**
  * tokenize - Create tokens, which are character arrays, from inputs given by the user
  *
- * @usr_input - struct that holds a string to search and tokenized strings
+ * @usr_input: struct that holds a string to search and tokenized strings
+ * @target: Characters that would indicate the end of a token
  */
 void tokenize(command_t *input, char *target)
 {
 	/**
-		count number of tokens (characters separated by spaces)
-		allocate an array of type token_t based off of number of tokens
+		count number of tokens (characters separated by target character)
+		allocate an array of chars based off of number of tokens
 		allocate enough space for an array of characters which represents a token
 	*/
 	char *tmp = NULL;
 
 	input->token_count = _count_tokens(input->input, target);
-	printf("token count: %i\n", input->token_count);
-	input->tokens = _init_memory(input->token_count * sizeof(char *));
+	input->tokens = _init_memory((input->token_count + 1) * sizeof(char *));
 
 
 	if (input->tokens == NULL)
 	{
-		_cleanup_and_exit(1, 1, input);
+		input->tokens[0] = NULL;
+		return;
 	}
 
 	tmp = input->input;
 	unsigned int i = 0, token_size = 0;
 
-	printf("tmp: %s\n", tmp);
-	while (*tmp != '\0')
+	while (*tmp != '\0' || tmp != NULL)
 	{
 		input->tokens[i] = _strtok(tmp, target);
 		token_size = _strlen(input->tokens[i]);
-		printf("i: %i\n", i);
 		if (token_size)
 		{
 			tmp += token_size;
 		}
 		else
 		{
-			printf("*tmp: %c", *tmp);
 			break;
 		}
 		if (_seek(target, *tmp))
@@ -302,11 +272,6 @@ void tokenize(command_t *input, char *target)
 		i++;
 	}
 	input->tokens[i] = NULL;
-	for (unsigned int i = 0; i <= input->token_count; i++)
-	{
-		printf("token [%d]: %s\n", i, input->tokens[i]);
-	}
-	printf("Finished printing tokens!\n");
 }
 
 
@@ -319,7 +284,6 @@ void tokenize(command_t *input, char *target)
  *	
  * Return - New character array
  */
-// char *_strtok(char *src, unsigned int token_size)
 char *_strtok(char *src, char *target)
 {
 	char *new_token = NULL;
@@ -340,13 +304,16 @@ char *_strtok(char *src, char *target)
 			{
 				return (NULL);
 			}
-			_strncpy_token(new_token, src, i);
+			if(!(_strncpy_token(new_token, src, i)))
+			{
+				return (NULL);
+			}
 			break;
 		}
 	}
 	/*
 	Account for the last token where there could be no target character
-	that indicates when to stop
+	that indicates the end of a token
 	*/
 	if (src[i] == '\0' && new_token == NULL)
 	{
@@ -355,13 +322,20 @@ char *_strtok(char *src, char *target)
 		{
 			return (NULL);
 		}
-		_strncpy_token(new_token, src, i);
+		if(!(_strncpy_token(new_token, src, i)))
+		{
+			return (NULL);
+		}
 	}
-	printf("new token: %s\n", new_token);
 	return (new_token);
 }
 
 
+/**
+ * _search_environ - Retrieve and search through the current working environment for variables of interest
+ * @dest: The pointer to the environment variable of interest
+ * @target: The characters that would be in the environment variable of interest
+ */
 void _search_environ(char **dest, char *target)
 {
 	for (int i = 0; environ[i]; i++)
@@ -374,10 +348,19 @@ void _search_environ(char **dest, char *target)
 	}
 }
 
-
+/**
+ * _filter - Ignore certain words by moving a pointer forward by x amount of characters
+ * @dest: string to filter
+ * @target: characters to ignore which moves the pointer to string forward
+ * Return - NULL if neither dest or target exist. Pointer to the new location in the string otherwise
+ */
 char *_filter(char *dest, char *target)
 {
 	int i = 0;
+	if (!target || !dest)
+	{
+		return (NULL);
+	}
 	while (target[i] != '\0')
 	{
 		if (target[i] == dest[i])

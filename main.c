@@ -6,19 +6,11 @@ int main(void)
 	command_t *usr_input = NULL;
 	command_t *paths = NULL;
 
-	initialize(&usr_input, &paths);
 	while (1)
 	{
+		initialize(&usr_input, &paths);
 		get_command(usr_input);
-		get_path(paths);
-		// for (unsigned int i = 0; i < usr_input->token_count; i++)
-		// {
-		// 	printf("usr in: %s\n", usr_input->tokens[i]);
-		// }
-		// for (unsigned int i = 0; i < paths->token_count; i++)
-		// {
-		// 	printf("paths: %s\n", paths->tokens[i]);
-		// }
+		get_path(usr_input, paths);
 		execute(usr_input, paths);
 	}
 	return (0);
@@ -30,6 +22,7 @@ int main(void)
  * to collect user input
  *
  * @usr_input: struct that holds user input and tokenized inputs
+ * @paths: struct that holds all the different types of paths in environment
  */
 void initialize(command_t **usr_input, command_t **paths)
 {
@@ -58,9 +51,57 @@ void get_command(command_t *usr_input)
 		_cleanup_and_exit(2, 1, usr_input);
 	}
 	usr_input->input_size = _getline(usr_input, STDOUT_FILENO);
-	printf("get_command character: %s", usr_input->input);
 	tokenize(usr_input, target);
+	if (!usr_input->tokens[0])
+	{
+		_cleanup_and_exit(4, 1, usr_input);
+	}
 }
+
+
+/**
+ * get_path - Get the PATH environment variable and add "/" to the end of each string in PATH
+ * ex: environment variable PATH=/usr/local/bin:/usr/bin:/bin
+ * output: /usr/local/bin/ /usr/bin/ /bin
+ * @usr_input: struct that holds user input and tokenized inputs
+ * @paths: struct that holds all the different types of paths in environment
+ */
+void get_path(command_t *usr_input, command_t *paths)
+{
+	char *tmp = NULL;
+	char *target[] = {"PATH=", ":", "/"};
+	int status = 0;
+
+	_search_environ(&tmp, target[0]);
+	if (!tmp)
+	{
+		_cleanup_and_exit(3, 2, usr_input, paths);
+	}
+	tmp = _filter(tmp, target[0]);
+	if (!tmp)
+	{
+		_cleanup_and_exit(6, 2, usr_input, paths);
+	}
+	paths->input_size = _strlen(tmp);
+	paths->input = _init_memory(paths->input_size + 1 * sizeof(char));
+	if (!paths->input)
+	{
+		_cleanup_and_exit(1, 2, usr_input, paths);
+	}
+	_strcpy(paths->input, tmp);
+	tokenize(paths, target[1]);
+	if (!paths->tokens[0])
+	{
+		_cleanup_and_exit(4, 2, usr_input, paths);
+	}
+
+	status = _resize_append(paths, target[2]);
+	if (status)
+	{
+		_cleanup_and_exit(status, 2, usr_input, paths);
+	}
+}
+
 
 /**
  * check_command - Take tokenized inputs and append them to directory paths
@@ -71,53 +112,29 @@ void get_command(command_t *usr_input)
  */
 void execute(command_t *usr_input, command_t *paths)
 {
-	// char *new = NULL;
+	int executed = 0;
 	struct stat st;
+	int status = 0;
 
-	_resize_append(paths, usr_input->tokens[0]);
+	status = _resize_append(paths, usr_input->tokens[0]);
+	if (status)
+	{
+		_cleanup_and_exit(status, 2, usr_input, paths);
+	}
 
-	// char *argv[] = {"/usr/bin/ls", "-la", "/usr/", NULL};
 	for (unsigned int i = 0; paths->tokens[i] != NULL; i++)
 	{
  		if (stat(paths->tokens[i], &st) == 0)
 		{
-			printf("%s\n", paths->tokens[i]);
-			// free(usr_input->tokens[0]);
-			// usr_input->tokens[0] = _init_memory(_strlen(paths->tokens[i]) + 1 * sizeof(char));
-			// new = _init_memory(_strlen(paths->tokens[i]) + 1 * sizeof(char));
-			// _strcpy(new, paths->tokens[i]);
-			// printf("new: %s\n", new);
-			for (unsigned int i = 0; i < usr_input->token_count; i++)
-			{
-				for (int j = 0; usr_input->tokens[i][j] != '\0'; j++)
-				{
-					printf("%i\n", usr_input->tokens[i][j]);
-				}
-				printf("\n");
-			}
 			_run_process(paths->tokens[i], usr_input->tokens);
-			// free(new);
-			// if (execve(usr_input->tokens[0], usr_input->tokens, NULL) == -1)
-			// {
-			// 	perror("Error:");
-			// }
+			executed = 1;
 			break;
 		}
-
 	}
-
-
-
-	// for (unsigned int i = 0; argv[i] != NULL; i++)
-	// {
-	// 	printf("token: %s\n", argv[i]);
-	// }
-
-	// _append_tokens(usr_input, paths);
-	// _prune_paths(paths);
-
-
-	printf("Freeing paths!\n");
-	_cleanup_and_exit(100, 2, usr_input, paths);
+	if (!executed)
+	{
+		printf("Command '%s' not found.\n", usr_input->input);
+	}
+	_cleanup_mem(2, usr_input, paths);
 }
 

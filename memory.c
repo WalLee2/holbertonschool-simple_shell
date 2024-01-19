@@ -17,6 +17,10 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 	exit_codes_t codes[] = {
 		{1, "Unable to allocate memory!\n"},
 		{2, "Failed to initialize struct usr_input!\n"},
+		{3, "Environment variable does not exist!\n"},
+		{4, "Failed to generate tokens!\n"},
+		{5, "Failed to resize buffer!\n"},
+		{6, "Unable to filter string!\n"},
 		{100, "Testing!\n"},
 		{-1, NULL}
 	};
@@ -39,6 +43,12 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 	}
 }
 
+
+/**
+ * _cleanup_mem - Free all allocated memory
+ * @n: Number of structs of type command_t to free
+ * variadic function as it accomodates for more structs to free if needed in the future
+ */
 void _cleanup_mem(const int n, ...)
 {
 	va_list ap;
@@ -114,9 +124,7 @@ unsigned int _resize(char **buf, const unsigned int size)
 	char *tmp = *buf;
 	int new_size = size * 2 * sizeof(char);
 
-	// printf("tmp: %p\n", tmp);
 	*buf = _init_memory(new_size);
-	// printf("buf: %p\n", *buf);
 
 	if (!buf)
 	{
@@ -124,11 +132,7 @@ unsigned int _resize(char **buf, const unsigned int size)
 	}
 
 	_strcpy(*buf, tmp);
-	// if (tmp)
-	// {
-	// 	free(tmp);
-	// }
+	free(tmp);
 
-	// printf("new size: %d\n", new_size);
 	return (new_size);
 }
