@@ -38,9 +38,10 @@ typedef struct exit_codes {
 
 /** String functions **/
 void _append(char *dest, char *src);
-int _check_command(command_t *usr_input, command_t *paths);
 unsigned int _count_tokens(char *array, char *target);
+int _check_directories(command_t *paths, char *target);
 char *_filter(char *dest, char *target);
+char *_reverse_filter_until_c(char *dest, char target);
 unsigned int _get_token_size(char *src, char *target);
 void _prune_paths(command_t *paths);
 int _resize_append(command_t *input, char *target);

@@ -27,7 +27,6 @@ void _append(char *dest, char *src)
  * @input: struct containing the pointer to buffer to resize
  * @target: character that indicates when to start appending
  */
-
 int _resize_append(command_t *input, char *target)
 {
 	int new_size = 0;
@@ -54,9 +53,9 @@ int _resize_append(command_t *input, char *target)
  */
 unsigned int _count_tokens(char *array, char *target)
 {
-	unsigned int count = 0, i = 0;
+	unsigned int count = 0;
 
-	for (; array[i] != '\0'; i++)
+	for (int i = 0; array[i] != '\0'; i++)
 	{
 		if(_seek(target, array[i]) || array[i + 1] == '\0')
 		{
@@ -64,6 +63,35 @@ unsigned int _count_tokens(char *array, char *target)
 		}
 	}
 	return (count);
+}
+
+
+
+/**
+ *
+ *
+ *
+ *
+ */
+int _check_directories(command_t *paths, char *target)
+{
+	int found = 0;
+	char *filtered = _init_memory((_strlen(target) + 1) * sizeof(char));
+
+	_strcpy(filtered, target);
+	filtered = _reverse_filter_until_c(filtered, '/');
+
+
+	for (unsigned int i = 0; i < paths->token_count; i++)
+	{
+		if (_strcmp(paths->tokens[i], filtered))
+		{
+			found = 1;
+		}
+	}
+	free(filtered);
+
+	return (found);
 }
 
 /**
@@ -286,7 +314,7 @@ void tokenize(command_t *input, char *target)
  */
 char *_strtok(char *src, char *target)
 {
-	char *new_token = NULL;
+	char *new_token = NULL, *tmp = NULL;
 	unsigned int i = 0;
 
 
@@ -295,11 +323,12 @@ char *_strtok(char *src, char *target)
 		return (new_token);
 	}
 
-	for (; src[i] != '\0'; i++)
+	tmp = src;
+	for (; tmp[i] != '\0'; i++)
 	{
-		if (_seek(target, src[i]))
+		if (_seek(target, tmp[i]))
 		{
-			new_token = _init_memory(i + 1 * sizeof(char));
+			new_token = _init_memory((i + 1) * sizeof(char));
 			if (new_token == NULL)
 			{
 				return (NULL);
@@ -315,9 +344,9 @@ char *_strtok(char *src, char *target)
 	Account for the last token where there could be no target character
 	that indicates the end of a token
 	*/
-	if (src[i] == '\0' && new_token == NULL)
+	if (src[i] == '\0' && new_token == NULL && i > 0)
 	{
-		new_token = _init_memory(i + 1 * sizeof(char));
+		new_token = _init_memory((i + 1) * sizeof(char));
 		if (new_token == NULL)
 		{
 			return (NULL);
@@ -370,4 +399,30 @@ char *_filter(char *dest, char *target)
 	}
 
 	return (dest + i);
+}
+
+/**
+ *
+ *
+ *
+ *
+ */
+char *_reverse_filter_until_c(char *dest, char target)
+{
+	char *tmp = NULL;
+	int len = 0;
+
+	len = _strlen(dest);
+
+	tmp = dest;
+	for (int i = 0; dest[i] != '\0'; i++)
+	{
+		tmp++;
+	}
+	for (int i = len; *tmp != target && i > 0; i--, tmp--)
+	{
+		dest[i] = '\0';
+	}
+
+	return (dest);
 }

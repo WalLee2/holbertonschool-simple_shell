@@ -21,6 +21,7 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 		{4, "Failed to generate tokens!\n"},
 		{5, "Failed to resize buffer!\n"},
 		{6, "Unable to filter string!\n"},
+		{7, "Invalid directory when executing command!\n"},
 		{100, "Testing!\n"},
 		{-1, NULL}
 	};
@@ -67,13 +68,10 @@ void _cleanup_mem(const int n, ...)
 			}
 			if (buf->tokens)
 			{
-				for (unsigned int i = 0; i < buf->token_count; i++)
+				for (unsigned int i = 0; buf->tokens[i] != NULL; i++)
 				{
-					if (buf->tokens[i] != NULL)
-					{
-						free(buf->tokens[i]);
-						buf->tokens[i] = NULL;						
-					}
+					free(buf->tokens[i]);
+					buf->tokens[i] = NULL;
 				}
 				free(buf->tokens);
 				buf->tokens = NULL;

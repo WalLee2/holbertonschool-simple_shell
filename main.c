@@ -77,17 +77,20 @@ void get_path(command_t *usr_input, command_t *paths)
 	{
 		_cleanup_and_exit(3, 2, usr_input, paths);
 	}
+
 	tmp = _filter(tmp, target[0]);
 	if (!tmp)
 	{
 		_cleanup_and_exit(6, 2, usr_input, paths);
 	}
+
 	paths->input_size = _strlen(tmp);
 	paths->input = _init_memory(paths->input_size + 1 * sizeof(char));
 	if (!paths->input)
 	{
 		_cleanup_and_exit(1, 2, usr_input, paths);
 	}
+
 	_strcpy(paths->input, tmp);
 	tokenize(paths, target[1]);
 	if (!paths->tokens[0])
@@ -100,40 +103,63 @@ void get_path(command_t *usr_input, command_t *paths)
 	{
 		_cleanup_and_exit(status, 2, usr_input, paths);
 	}
+
+
+	/*
+		If user gives a path to an executable check the directory to see if it's in PATH
+		Otherwise append the command to all the directories found in PATH
+	*/
+	if (_seek(usr_input->input, target[2][0]))
+	{
+		if (!(_check_directories(paths, usr_input->tokens[0])))
+		{
+			_cleanup_and_exit(7, 2, usr_input, paths);
+		}
+	}
+	else
+	{
+		status = _resize_append(paths, usr_input->tokens[0]);
+		if (status)
+		{
+			_cleanup_and_exit(status, 2, usr_input, paths);
+		}
+	}
 }
 
 
 /**
- * check_command - Take tokenized inputs and append them to directory paths
+ * execute - Take tokenized inputs and append them to directory paths
  * found in PATH environment variable
  * Use the stat system call to see if input exists in new directory path
  *
  * @usr_input: struct that holds user input and tokenized inputs
+ * @paths: struct that holds all directories found in PATH environment variable
  */
 void execute(command_t *usr_input, command_t *paths)
 {
 	int executed = 0;
 	struct stat st;
-	int status = 0;
 
-	status = _resize_append(paths, usr_input->tokens[0]);
-	if (status)
+	if (_seek(usr_input->tokens[0], '/'))
 	{
-		_cleanup_and_exit(status, 2, usr_input, paths);
+		_run_process(usr_input->tokens[0], usr_input->tokens);
+		executed = 1;
 	}
-
-	for (unsigned int i = 0; paths->tokens[i] != NULL; i++)
+	else
 	{
- 		if (stat(paths->tokens[i], &st) == 0)
+		for (unsigned int i = 0; paths->tokens[i] != NULL; i++)
 		{
-			_run_process(paths->tokens[i], usr_input->tokens);
-			executed = 1;
-			break;
-		}
+	 		if (stat(paths->tokens[i], &st) == 0)
+			{
+				_run_process(paths->tokens[i], usr_input->tokens);
+				executed = 1;
+				break;
+			}
+		}		
 	}
 	if (!executed)
 	{
-		printf("Command '%s' not found.\n", usr_input->input);
+		printf("Command '%s' not found.\n", usr_input->tokens[0]);
 	}
 	_cleanup_mem(2, usr_input, paths);
 }

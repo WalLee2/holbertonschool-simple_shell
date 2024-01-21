@@ -48,3 +48,32 @@ ssize_t _getline(command_t *usr_input, int fd)
 	usr_input->input = buf;
 	return (total);
 }
+
+
+/**
+ * _run_process - run a command in a child process
+ * @command: The command to be ran
+ * @args: Array that holds user input
+ */
+void _run_process(char *command, char **args)
+{
+	pid_t child;
+	int status;
+
+	child = fork();
+	if (child == -1)
+	{
+		perror("Child process returned -1!\n");
+	}
+	if (child == 0)
+	{
+		if (execve(command, args, NULL) == -1)
+		{
+			perror("An error occurred when executing!\n");
+		}
+	}
+	else
+	{
+		wait(&status);
+	}
+}
