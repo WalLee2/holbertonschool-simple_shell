@@ -68,10 +68,11 @@ unsigned int _count_tokens(char *array, char *target)
 
 
 /**
- *
- *
- *
- *
+ * _check_directories - if user provides a directory to execute ensure that
+ * the directory is in the PATH
+ * @paths: struct that holds all directories found in PATH
+ * @target: The directory provided by the user to check
+ * Return - 1 if directory provided by the user is found in PATH and 0 otherwise.
  */
 int _check_directories(command_t *paths, char *target)
 {
@@ -402,10 +403,11 @@ char *_filter(char *dest, char *target)
 }
 
 /**
- *
- *
- *
- *
+ * _reverse_filter_until_c - Ignore characters from the end of a string
+ * until a target character is found
+ * @dest: The string to evaluate
+ * @target: The character to stop appending the null termintor to
+ * Return - Pointer to the new string
  */
 char *_reverse_filter_until_c(char *dest, char target)
 {
