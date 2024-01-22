@@ -12,13 +12,14 @@
 extern char **environ;
 
 /**
- * struct commands - struct that holds input strings to be made into tokens for further action
+ * struct commands - struct that holds input strings to be made into tokens
  * @input: string to turn into tokens
  * @input_size: character count of input string
- * @tokens: input string turned into an array of structs that holds the string and the size
+ * @tokens: array of structs where each array member points to a string (token)
  * @token_count: total number of tokens
  */
-typedef struct commands {
+typedef struct commands
+{
 	char *input;
 	unsigned int input_size;
 	char **tokens;
@@ -30,7 +31,8 @@ typedef struct commands {
  * @code: Integer code that is the reason for failure
  * @msg: Reason for failure in English
  */
-typedef struct exit_codes {
+typedef struct exit_codes
+{
 	int code;
 	char *msg;
 } exit_codes_t;

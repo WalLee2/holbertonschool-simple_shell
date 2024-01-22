@@ -23,7 +23,7 @@ void _append(char *dest, char *src)
 }
 
 /**
- * _append - Add characters to the end of a character array up to n bytes
+ * _append_n - Add characters to the end of a character array up to n bytes
  *
  * @dest: Character array to add
  * @src: Character array to copy from
@@ -44,15 +44,17 @@ void _append_n(char *dest, char *src, int n)
 	dest[i + j] = '\0';
 }
 /**
- * _resize_append - function that resizes buffer and appends to the end of a buffer
+ * _resize_append - function that resizes buffer and appends characters
  * @input: struct containing the pointer to buffer to resize
  * @target: character that indicates when to start appending
+ * Return: 5 on failure to resize or 0 on success
  */
 int _resize_append(command_t *input, char *target)
 {
 	int new_size = 0;
+	unsigned int i = 0;
 
-	for (unsigned int i = 0; input->tokens[i] != NULL; i++)
+	for (i = 0; input->tokens[i] != NULL; i++)
 	{
 		new_size = _strlen(input->tokens[i]) + _strlen(target) + 1;
 		new_size = _resize(&input->tokens[i], new_size);
@@ -67,18 +69,21 @@ int _resize_append(command_t *input, char *target)
 
 
 /**
- * _count_tokens - Count the number of tokens and if there are characters in array
+ * _count_tokens - Count the number of tokens that is delimited by characters
+ * passed into *target
  *
  * @array: Character array to search
  * @target: Any character saying all characters up until this point is a token
+ * Return: The number of tokens delimited by characters found in target
  */
 unsigned int _count_tokens(char *array, char *target)
 {
 	unsigned int count = 0;
+	int i;
 
-	for (int i = 0; array[i] != '\0'; i++)
+	for (i = 0; array[i] != '\0'; i++)
 	{
-		if(_seek(target, array[i]) || array[i + 1] == '\0')
+		if (_seek(target, array[i]) || array[i + 1] == '\0')
 		{
 			count++;
 		}
@@ -93,18 +98,19 @@ unsigned int _count_tokens(char *array, char *target)
  * the directory is in the PATH
  * @paths: struct that holds all directories found in PATH
  * @target: The directory provided by the user to check
- * Return - 1 if directory provided by the user is found in PATH and 0 otherwise.
+ * Return: 1 if directory provided by the user is found in PATH else 0.
  */
 int _check_directories(command_t *paths, char *target)
 {
 	int found = 0;
+	unsigned int i;
 	char *filtered = _init_memory((_strlen(target) + 1) * sizeof(char));
 
 	_strcpy(filtered, target);
 	filtered = _reverse_filter_until_c(filtered, '/');
 
 
-	for (unsigned int i = 0; i < paths->token_count; i++)
+	for (i = 0; i < paths->token_count; i++)
 	{
 		if (_strcmp(paths->tokens[i], filtered))
 		{
@@ -120,15 +126,16 @@ int _check_directories(command_t *paths, char *target)
  * _get_token_size - get size of the token up until a target character
  * @src: Source array to search
  * @target: Character array that contains target characters to stop count and return
- * Return - The length of a token
+ * Return: The length of a token
  */
 unsigned int _get_token_size(char *src, char *target)
 {
-	int i = 0;
+	int i;
+	int j;
 
-	for (; src[i] != '\0'; i++)
+	for (i = 0; src[i] != '\0'; i++)
 	{
-		for (int j = 0; target[j] != '\0'; j++)
+		for (j = 0; target[j] != '\0'; j++)
 		{
 			if (src[i] == target[j])
 			{
@@ -145,11 +152,13 @@ unsigned int _get_token_size(char *src, char *target)
  *
  * @src: Array to search through
  * @c: Target character to find
- * Return - 0 if not found 1 if found
+ * Return: 0 if not found 1 if found
  */
 int _seek(char *src, char c)
 {
-	for (int i = 0; src[i] != '\0'; i++)
+	int i;
+
+	for (i = 0; src[i] != '\0'; i++)
 	{
 		if (src[i] == c)
 		{
@@ -163,7 +172,7 @@ int _seek(char *src, char c)
 /**
  * _strlen - Find the length of a string
  * @src: Character array to find the length of
- * Return - The length of the string
+ * Return: The length of the string
  */
 int _strlen(char *src)
 {
@@ -174,7 +183,7 @@ int _strlen(char *src)
 		i++;
 	}
 
-	return i;
+	return (i);
 }
 
 /**
@@ -182,7 +191,7 @@ int _strlen(char *src)
  *
  * @dest: Destination array to copy to
  * @src: Source array to copy from
- * Return - 0 on failure and 1 on success
+ * Return: 0 on failure and 1 on success
  */
 int _strcpy(char *dest, char *src)
 {
@@ -203,12 +212,12 @@ int _strcpy(char *dest, char *src)
 }
 
 /**
- * _strncpy - Copy n number of characters from source array to destination array
+ * _strncpy - Copy n number of characters from src to dest array
  *
  * @dest: Destination array to copy to
  * @src: Source array to copy from
  * @n: Number of characters to copy that can fit in dest array
- * Return - 0 on failure and 1 on success
+ * Return: 0 on failure and 1 on success
  */
 int _strncpy(char *dest, char *src, int n)
 {
@@ -227,11 +236,13 @@ int _strncpy(char *dest, char *src, int n)
 }
 
 /**
- * _strncpy_token - Copy n number of characters from source to destination array and append '\0'
+ * _strncpy_token - Copy n number of characters from src to dest array
+ * and append '\0'
+ *
  * @dest: Destination array to copy to
  * @src: Source array to copy from
  * @n: Number of characters that can fit in destination array
- * Return - 0 on failure and 1 on success
+ * Return: 0 on failure and 1 on success
  */
 int _strncpy_token(char *dest, char *src, int n)
 {
@@ -258,12 +269,14 @@ int _strncpy_token(char *dest, char *src, int n)
  * @haystack: String to search
  * @needle: String to find
  *
- * Return - 1 if found, 0 otherwise 
+ * Return: 1 if found, 0 otherwise
  */
 int _strcmp(char *haystack, char *needle)
 {
+	int i;
 
-	for (int i = 0; needle[i] != '\0'; i++)
+
+	for (i = 0; needle[i] != '\0'; i++)
 	{
 		if (haystack[i] != needle[i])
 		{
@@ -275,19 +288,22 @@ int _strcmp(char *haystack, char *needle)
 }
 
 /**
- * tokenize - Create tokens, which are character arrays, from inputs given by the user
+ * tokenize - Create tokens, which are character arrays,
+ * from inputs given by the user
  *
- * @usr_input: struct that holds a string to search and tokenized strings
+ * @input: struct that holds a string to search and tokenized strings
  * @target: Characters that would indicate the end of a token
  */
 void tokenize(command_t *input, char *target)
 {
 	/**
-		count number of tokens (characters separated by target character)
-		allocate an array of chars based off of number of tokens
-		allocate enough space for an array of characters which represents a token
-	*/
+	 * count number of tokens (characters separated by target character)
+	 * allocate an array of chars based off of number of tokens
+	 * allocate enough space for an array of characters which represents a token
+	 */
 	char *tmp = NULL;
+	unsigned int i = 0, token_size = 0;
+
 
 	input->token_count = _count_tokens(input->input, target);
 	input->tokens = _init_memory((input->token_count + 1) * sizeof(char *));
@@ -300,7 +316,6 @@ void tokenize(command_t *input, char *target)
 	}
 
 	tmp = input->input;
-	unsigned int i = 0, token_size = 0;
 
 	while (*tmp != '\0' || tmp != NULL)
 	{
@@ -330,13 +345,12 @@ void tokenize(command_t *input, char *target)
  *
  * @src: Array to search
  * @target: Any character saying all characters up until this point is a token
- *	
- * Return - New character array
+ * Return: New character array
  */
 char *_strtok(char *src, char *target)
 {
 	char *new_token = NULL, *tmp = NULL;
-	unsigned int i = 0;
+	unsigned int i;
 
 
 	if (!src)
@@ -345,7 +359,7 @@ char *_strtok(char *src, char *target)
 	}
 
 	tmp = src;
-	for (; tmp[i] != '\0'; i++)
+	for (i = 0; tmp[i] != '\0'; i++)
 	{
 		if (_seek(target, tmp[i]))
 		{
@@ -354,17 +368,13 @@ char *_strtok(char *src, char *target)
 			{
 				return (NULL);
 			}
-			if(!(_strncpy_token(new_token, src, i)))
+			if (!(_strncpy_token(new_token, src, i)))
 			{
 				return (NULL);
 			}
 			break;
 		}
 	}
-	/*
-	Account for the last token where there could be no target character
-	that indicates the end of a token
-	*/
 	if (src[i] == '\0' && new_token == NULL && i > 0)
 	{
 		new_token = _init_memory((i + 1) * sizeof(char));
@@ -372,7 +382,7 @@ char *_strtok(char *src, char *target)
 		{
 			return (NULL);
 		}
-		if(!(_strncpy_token(new_token, src, i)))
+		if (!(_strncpy_token(new_token, src, i)))
 		{
 			return (NULL);
 		}
@@ -382,13 +392,17 @@ char *_strtok(char *src, char *target)
 
 
 /**
- * _search_environ - Retrieve and search through the current working environment for variables of interest
+ * _search_environ - Retrieve and search through the current
+ * working environment for variables of interest
  * @dest: The pointer to the environment variable of interest
- * @target: The characters that would be in the environment variable of interest
+ * @target: Characters in the environment variable of interest
  */
 void _search_environ(char **dest, char *target)
 {
-	for (int i = 0; environ[i]; i++)
+	int i;
+
+
+	for (i = 0; environ[i]; i++)
 	{
 		if (_strcmp(environ[i], target))
 		{
@@ -399,14 +413,17 @@ void _search_environ(char **dest, char *target)
 }
 
 /**
- * _filter - Ignore certain words by moving a pointer forward by x amount of characters
+ * _filter - Ignore certain words by moving a pointer forward by
+ * x amount of characters
  * @dest: string to filter
  * @target: characters to ignore which moves the pointer to string forward
- * Return - NULL if neither dest or target exist. Pointer to the new location in the string otherwise
+ * Return: NULL if neither dest or target exist
+ *          Pointer to the new location in the string otherwise
  */
 char *_filter(char *dest, char *target)
 {
 	int i = 0;
+
 	if (!target || !dest)
 	{
 		return (NULL);
@@ -427,21 +444,22 @@ char *_filter(char *dest, char *target)
  * until a target character is found
  * @dest: The string to evaluate
  * @target: The character to stop appending the null termintor to
- * Return - Pointer to the new string
+ * Return: Pointer to the new string
  */
 char *_reverse_filter_until_c(char *dest, char target)
 {
 	char *tmp = NULL;
 	int len = 0;
+	int i;
 
 	len = _strlen(dest);
 
 	tmp = dest;
-	for (int i = 0; dest[i] != '\0'; i++)
+	for (i = 0; dest[i] != '\0'; i++)
 	{
 		tmp++;
 	}
-	for (int i = len; *tmp != target && i > 0; i--, tmp--)
+	for (i = len; *tmp != target && i > 0; i--, tmp--)
 	{
 		dest[i] = '\0';
 	}

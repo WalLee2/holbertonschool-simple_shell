@@ -2,17 +2,15 @@
 
 
 /**
- * _cleanup - Function used to free up memory if unexpected behavior occurs and we need to exit
- *
- * @msg: Error message to print to standard output
- * @exit_code: integer value to exit the program with 
+ * _cleanup_and_exit - Function used to free up memory and to exit
+ * @exit_code: integer value to exit the program with
  * @n: Number of structs that need to free-ing before exiting program
  */
-// void _cleanup(const char *msg, const int exit_code, command_t *buf)
 void _cleanup_and_exit(const int exit_code, const int n, ...)
 {
 	va_list ap;
 	command_t *buf = NULL;
+	int i;
 
 	exit_codes_t codes[] = {
 		{1, "Unable to allocate memory!\n"},
@@ -27,14 +25,14 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 	};
 
 	va_start(ap, n);
-	for (int i = 0; i < n; i++)
+	for (i = 0; i < n; i++)
 	{
 		buf = va_arg(ap, command_t *);
 		_cleanup_mem(1, buf);
 	}
 	va_end(ap);
 
-	for (int i = 0; codes[i].msg != NULL; i++)
+	for (i = 0; codes[i].msg != NULL; i++)
 	{
 		if (codes[i].code == exit_code)
 		{
@@ -48,15 +46,17 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 /**
  * _cleanup_mem - Free all allocated memory
  * @n: Number of structs of type command_t to free
- * variadic function as it accomodates for more structs to free if needed in the future
+ * variadic function as it accomodates for more structs to free
  */
 void _cleanup_mem(const int n, ...)
 {
 	va_list ap;
 	command_t *buf = NULL;
+	int i;
+	unsigned int j;
 
 	va_start(ap, n);
-	for (int i = 0; i < n; i++) 
+	for (i = 0; i < n; i++)
 	{
 		buf = va_arg(ap, command_t *);
 		if (buf)
@@ -68,9 +68,9 @@ void _cleanup_mem(const int n, ...)
 			}
 			if (buf->tokens)
 			{
-				for (unsigned int i = 0; buf->tokens[i] != NULL; i++)
+				for (j = 0; buf->tokens[j] != NULL; j++)
 				{
-					free(buf->tokens[i]);
+					free(buf->tokens[j]);
 					buf->tokens[i] = NULL;
 				}
 				free(buf->tokens);
@@ -84,11 +84,9 @@ void _cleanup_mem(const int n, ...)
 }
 
 /**
- * _init_memory - Create dynamically allocated space and properly wipe any previous memory
- *
+ * _init_memory - Create dynamically allocated space and wipe previous memory
  * @size: total size of dynamic memory
- *
- * Return - void pointer to the created memory
+ * Return: void pointer to the created memory
  */
 void *_init_memory(const unsigned int size)
 {
@@ -109,13 +107,13 @@ void *_init_memory(const unsigned int size)
 
 
 /**
- * _resize - Resize previously created dynamic memory and free it after contents have been
- * properly copied over
+ * _resize - Resize previously created dynamic memory and free it
+ * after contents have been properly copied over
  *
  * @buf: Double pointer to dynamic memory that needs to be resized
  * @size: constant unsigned int of previous size of dynamic memory
  *
- * Return - New size of the resized array 
+ * Return: New size of the resized array
  */
 unsigned int _resize(char **buf, const unsigned int size)
 {

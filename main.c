@@ -1,5 +1,11 @@
 #include "shell.h"
 
+/**
+ * main - Initialize structs, get user input,
+ * get directories found in PATH environment variable
+ * execute command if certain requirements are met
+ * Return: Zero when exiting
+ */
 int main(void)
 {
 
@@ -60,7 +66,8 @@ void get_command(command_t *usr_input)
 
 
 /**
- * get_path - Get the PATH environment variable and add "/" to the end of each string in PATH
+ * get_path - Get the PATH environment variable and add "/" to the end of
+ * each string in PATH
  * ex: environment variable PATH=/usr/local/bin:/usr/bin:/bin
  * output: /usr/local/bin/ /usr/bin/ /bin
  * @usr_input: struct that holds user input and tokenized inputs
@@ -104,11 +111,11 @@ void get_path(command_t *usr_input, command_t *paths)
 		_cleanup_and_exit(status, 2, usr_input, paths);
 	}
 
-
 	/*
-		If user gives a path to an executable check the directory to see if it's in PATH
-		Otherwise append the command to all the directories found in PATH
-	*/
+	 *	If user gives a path to an executable check the directory to see if
+	 *	it's in PATH
+	 *	Otherwise append the command to all the directories found in PATH
+	 */
 	if (_seek(usr_input->tokens[0], target[2][0]))
 	{
 		if (!(_check_directories(paths, usr_input->tokens[0])))
@@ -137,6 +144,7 @@ void get_path(command_t *usr_input, command_t *paths)
  */
 void execute(command_t *usr_input, command_t *paths)
 {
+	unsigned int i = 0;
 	int executed = 0;
 	struct stat st;
 
@@ -147,15 +155,15 @@ void execute(command_t *usr_input, command_t *paths)
 	}
 	else
 	{
-		for (unsigned int i = 0; paths->tokens[i] != NULL; i++)
+		for (; paths->tokens[i] != NULL; i++)
 		{
-	 		if (stat(paths->tokens[i], &st) == 0)
+			if (stat(paths->tokens[i], &st) == 0)
 			{
 				_run_process(paths->tokens[i], usr_input->tokens);
 				executed = 1;
 				break;
 			}
-		}		
+		}
 	}
 	if (!executed)
 	{

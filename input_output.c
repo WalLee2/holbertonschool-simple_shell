@@ -3,11 +3,9 @@
 
 /**
  * _getline - Get all characters entered by a user
- *
  * @usr_input: struct that holds user input and tokenized inputs
  * @fd: File descriptor used to read characters from standard input
- *
- * Return - Total bytes read from standard input
+ * Return: Total bytes read from standard input
  */
 ssize_t _getline(command_t *usr_input, int fd)
 {
