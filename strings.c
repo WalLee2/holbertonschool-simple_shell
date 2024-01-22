@@ -23,6 +23,27 @@ void _append(char *dest, char *src)
 }
 
 /**
+ * _append - Add characters to the end of a character array up to n bytes
+ *
+ * @dest: Character array to add
+ * @src: Character array to copy from
+ * @n: The max number of bytes to be copied from src to dest
+ */
+void _append_n(char *dest, char *src, int n)
+{
+	int i, j;
+
+	for (i = 0; dest[i] != '\0'; i++)
+		;
+
+	for (j = 0; src[j] != '\0' && j < n; j++)
+	{
+		dest[j + i] = src[j];
+	}
+
+	dest[i + j] = '\0';
+}
+/**
  * _resize_append - function that resizes buffer and appends to the end of a buffer
  * @input: struct containing the pointer to buffer to resize
  * @target: character that indicates when to start appending
@@ -128,14 +149,14 @@ unsigned int _get_token_size(char *src, char *target)
  */
 int _seek(char *src, char c)
 {
-	char special[] = {'\n', '\t', ' '};
-
 	for (int i = 0; src[i] != '\0'; i++)
 	{
-		if (special[i] == c || src[i] == c)
-			return 1;
+		if (src[i] == c)
+		{
+			return (1);
+		}
 	}
-	return 0;
+	return (0);
 }
 
 
@@ -241,17 +262,16 @@ int _strncpy_token(char *dest, char *src, int n)
  */
 int _strcmp(char *haystack, char *needle)
 {
-	int found = 1;
 
 	for (int i = 0; needle[i] != '\0'; i++)
 	{
 		if (haystack[i] != needle[i])
 		{
-			found = 0;
+			return (0);
 		}
 	}
 
-	return found;
+	return (1);
 }
 
 /**

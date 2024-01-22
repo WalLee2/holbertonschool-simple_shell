@@ -40,7 +40,7 @@ ssize_t _getline(command_t *usr_input, int fd)
 		}
 		else
 		{
-			_append(buf, helper);
+			_append_n(buf, helper, read_bytes);
 		}
 		if (_seek(helper, '\n'))
 			break;

@@ -109,7 +109,7 @@ void get_path(command_t *usr_input, command_t *paths)
 		If user gives a path to an executable check the directory to see if it's in PATH
 		Otherwise append the command to all the directories found in PATH
 	*/
-	if (_seek(usr_input->input, target[2][0]))
+	if (_seek(usr_input->tokens[0], target[2][0]))
 	{
 		if (!(_check_directories(paths, usr_input->tokens[0])))
 		{
