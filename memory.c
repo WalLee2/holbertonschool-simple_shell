@@ -13,6 +13,7 @@ void _cleanup_and_exit(const int exit_code, const int n, ...)
 	int i;
 
 	exit_codes_t codes[] = {
+		{0, "Exiting and freeing\n"},
 		{1, "Unable to allocate memory!\n"},
 		{2, "Failed to initialize struct usr_input!\n"},
 		{3, "Environment variable does not exist!\n"},
@@ -71,7 +72,6 @@ void _cleanup_mem(const int n, ...)
 				for (j = 0; buf->tokens[j] != NULL; j++)
 				{
 					free(buf->tokens[j]);
-					buf->tokens[i] = NULL;
 				}
 				free(buf->tokens);
 				buf->tokens = NULL;

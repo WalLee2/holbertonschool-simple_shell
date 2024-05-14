@@ -59,8 +59,9 @@ void _search_environ(char **dest, char *target);
 void tokenize(command_t *usr_input, char *target);
 
 
-/** Process functions **/
+/** Run functions **/
 void _run_process(char *command, char **args);
+int _run_builtin(command_t *usr_input, command_t *paths);
 
 /** Memory functions **/
 void *_new_mem(const unsigned int size);

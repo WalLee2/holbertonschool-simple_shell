@@ -16,8 +16,11 @@ int main(void)
 	{
 		initialize(&usr_input, &paths);
 		get_command(usr_input);
-		get_path(usr_input, paths);
-		execute(usr_input, paths);
+		if (!_run_builtin(usr_input, paths))
+		{
+			get_path(usr_input, paths);
+			execute(usr_input, paths);
+		}
 	}
 	return (0);
 }
